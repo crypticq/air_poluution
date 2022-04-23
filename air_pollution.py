@@ -3,7 +3,7 @@
 from os import stat
 from traceback import print_tb
 import requests
-import feedparser
+import feedparser # pip install
 import json
 
 city = input('Enter your city: ')
