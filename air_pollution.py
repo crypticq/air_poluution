@@ -91,11 +91,17 @@ def ncm_gov_sa():
     d = feedparser.parse('http://ncm.gov.sa/Ar/alert/Pages/feedalerts.aspx')
     for i in d.entries:
         if "rain" or "Rain" in (i['summary']):
-            print(i['summary'])
+            f = i['summary']
+            try:
+                city_name = (f.split(',')[-1].split('-')[1])
+                date = (f.split(',')[2])
+                print ("Excpected cloudy weather at" , city_name, date)
+                
+            except:
+                pass
         
 
 
-ncm_gov_sa()
 print("Excpected cloudy weather at {}".format(ncm_gov_sa()))
 print('YOUR WEATHER status now in is {}'.format(curent_weather(city)[0]))
 print('YOUR WEATHER description now is {}'.format(curent_weather(city)[1]))
