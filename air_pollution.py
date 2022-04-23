@@ -1,6 +1,12 @@
 
 
+from os import stat
+from traceback import print_tb
 import requests
+import feedparser
+import json
+
+city = input('Enter your city: ')
 
 
 def get_air_index_value(air_index):
@@ -31,15 +37,30 @@ headers = {
     'Cache-Control': 'max-age=0',
 }
 
+
+def get_lat_lon(city_name):
+    geo_city = "http://api.openweathermap.org/geo/1.0/direct?q="+city_name+"&limit=1&appid=9df3f65223f5d0da919ec90525134833"
+
+    response = requests.get(geo_city)
+    data = response.json()[0]
+    lat_city = str(response.json()[0]['lat'])
+    lon_city = str(response.json()[0]['lon'])
+    return lat_city,lon_city
+
+
+
+latitude = get_lat_lon(city)[0]
+longitude = get_lat_lon(city)[1]
 params = {
-    'lat': '21.437273',
-    'lon': '40.512714',
+    'lat': latitude,
+    'lon': longitude,
     'appid': '9df3f65223f5d0da919ec90525134833',
 }
 
 response = requests.get('https://api.openweathermap.org/data/2.5/air_pollution', headers=headers, params=params)
 
 data = response.json()
+
 
 carbon = (data['list'][0]['components']['co'])
 nitrogen = (data['list'][0]['components']['no'])
@@ -50,7 +71,35 @@ partical_matter = (data['list'][0]['components']['pm2_5'])
 partical_matter2 = (data['list'][0]['components']['pm10'])
 nh3 = (data['list'][0]['components']['nh3'])
 
-print("Air status is {}".format(get_air_index_value(data['list'][0]['main']['aqi'])))
+def curent_weather(city):
+    
+    params = {
+        'q': city,
+        'units': 'metric',
+        'APPID': '9df3f65223f5d0da919ec90525134833',
+    }
+
+    response = requests.get('https://api.openweathermap.org/data/2.5/weather', headers=headers, params=params)
+    data = response.json()
+    stat =  data['weather'][0]['main']
+    description = data['weather'][0]['description']
+    return stat, description
+    
+
+
+def ncm_gov_sa():
+    d = feedparser.parse('http://ncm.gov.sa/Ar/alert/Pages/feedalerts.aspx')
+    for i in d.entries:
+        if "rain" or "Rain" in (i['summary']):
+            print(i['summary'])
+        
+
+
+ncm_gov_sa()
+print("Excpected cloudy weather at {}".format(ncm_gov_sa()))
+print('YOUR WEATHER status now in is {}'.format(curent_weather(city)[0]))
+print('YOUR WEATHER description now is {}'.format(curent_weather(city)[1]))
+print("Air status in {} is {}".format(city,get_air_index_value(data['list'][0]['main']['aqi'])))
 print(f'Carbon in air is {carbon}')
 print(f'nitrogen in air is {nitrogen}')
 print(f'nitrogen_dioxide in air is {nitrogen_dioxide}')
