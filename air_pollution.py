@@ -95,7 +95,7 @@ def ncm_gov_sa():
             try:
                 city_name = (f.split(',')[-1].split('-')[1])
                 date = (f.split(',')[2])
-                print ("Excpected cloudy weather at" , city_name, date)
+                return ("Excpected cloudy weather at" , city_name, date)
                 
             except:
                 pass
